@@ -1,138 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import SensorCard from './SensorCard';
-import SensorChart from './SensorChart';
-import AttackSimulator from './AttackSimulator';
+import React, { useState } from 'react';
 
-const Dashboard = ({ user, onLogout }) => {
-  const [readings, setReadings] = useState({
-    moisture: 0,
-    temperature: 0,
-    valve: 0,
-    anomaly_detected: false,
-    anomaly_score: 0
-  });
-  const [history, setHistory] = useState({
-    moisture: [],
-    temperature: [],
-    valve: [],
-    timestamps: []
-  });
+const Login = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchReadings = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/readings');
-        const data = await response.json();
-        
-        setReadings(data);
-        
-        // Update history (keep last 50 points)
-        setHistory(prev => ({
-          moisture: [...prev.moisture, data.moisture].slice(-50),
-          temperature: [...prev.temperature, data.temperature].slice(-50),
-          valve: [...prev.valve, data.valve].slice(-50),
-          timestamps: [...prev.timestamps, new Date(data.timestamp).toLocaleTimeString()].slice(-50)
-        }));
-      } catch (err) {
-        console.error('Error fetching readings:', err);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        onLogin(data.user);
+      } else {
+        setError(data.message || 'Login failed');
       }
-    };
-
-    fetchReadings();
-    const interval = setInterval(fetchReadings, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    } catch (err) {
+      setError('Connection error. Please ensure the backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <div className="bg-gray-800 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-green-400">Smart Irrigation Monitor</h1>
-            
-            </div>
-            <button
-              onClick={onLogout}
-              className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded transition"
-            >
-              Logout
-            </button>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-900 via-green-800 to-emerald-900">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-96">
+        <div className="text-center mb-8">
+          <div className="bg-green-600 w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+            </svg>
           </div>
-        </div>
-      </div>
-
-      {/* Alert Banner */}
-      {readings.anomaly_detected && (
-        <div className="bg-red-600 text-white px-6 py-3 text-center font-semibold animate-pulse">
-          ⚠️ ANOMALY DETECTED - Unusual sensor readings detected! Score: {readings.anomaly_score.toFixed(4)}
-        </div>
-      )}
-
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Sensor Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <SensorCard
-            title="Soil Moisture"
-            value={readings.moisture}
-            unit="%"
-            icon="💧"
-            color="blue"
-            status={readings.moisture < 35 ? 'Low' : readings.moisture > 60 ? 'High' : 'Normal'}
-          />
-          <SensorCard
-            title="Soil Temperature"
-            value={readings.temperature}
-            unit="°C"
-            icon="🌡️"
-            color="orange"
-            status={readings.temperature < 20 ? 'Low' : readings.temperature > 30 ? 'High' : 'Normal'}
-          />
-          <SensorCard
-            title="Irrigation Valve"
-            value={readings.valve === 1 ? 'OPEN' : 'CLOSED'}
-            unit=""
-            icon="🚰"
-            color={readings.valve === 1 ? 'green' : 'gray'}
-            status={readings.valve === 1 ? 'Active' : 'Inactive'}
-          />
+          <h1 className="text-3xl font-bold text-white mb-2">AgriCyber</h1>
+          <p className="text-gray-400">Smart Farm Monitoring</p>
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <SensorChart
-            title="Soil Moisture Over Time"
-            data={history.moisture}
-            labels={history.timestamps}
-            color="rgb(59, 130, 246)"
-            unit="%"
-          />
-          <SensorChart
-            title="Soil Temperature Over Time"
-            data={history.temperature}
-            labels={history.timestamps}
-            color="rgb(249, 115, 22)"
-            unit="°C"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-300 mb-2 text-sm">Username</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
+              placeholder="Enter username"
+              required
+            />
+          </div>
 
-        <div className="mb-8">
-          <SensorChart
-            title="Irrigation Valve Status"
-            data={history.valve}
-            labels={history.timestamps}
-            color="rgb(34, 197, 94)"
-            unit=""
-            type="step"
-          />
-        </div>
+          <div>
+            <label className="block text-gray-300 mb-2 text-sm">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
+              placeholder="Enter password"
+              required
+            />
+          </div>
 
-        {/* Attack Simulator */}
-        <AttackSimulator />
+          {error && (
+            <div className="bg-red-900 text-red-200 p-3 rounded text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition disabled:opacity-50"
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default Login;

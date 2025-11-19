@@ -8,7 +8,6 @@ const Dashboard = ({ user, onLogout }) => {
     moisture: 0,
     temperature: 0,
     valve: 0,
-    valve_flow_rate: 0,
     anomaly_detected: false,
     anomaly_score: 0
   });
@@ -16,7 +15,6 @@ const Dashboard = ({ user, onLogout }) => {
     moisture: [],
     temperature: [],
     valve: [],
-    valve_flow_rate: [],
     timestamps: []
   });
 
@@ -33,7 +31,6 @@ const Dashboard = ({ user, onLogout }) => {
           moisture: [...prev.moisture, data.moisture].slice(-50),
           temperature: [...prev.temperature, data.temperature].slice(-50),
           valve: [...prev.valve, data.valve].slice(-50),
-          valve_flow_rate: [...prev.valve_flow_rate, data.valve_flow_rate].slice(-50),
           timestamps: [...prev.timestamps, new Date(data.timestamp).toLocaleTimeString()].slice(-50)
         }));
       } catch (err) {
@@ -54,9 +51,7 @@ const Dashboard = ({ user, onLogout }) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-green-400">Smart Irrigation Monitor</h1>
-              <p className="text-gray-400 text-sm mt-1">
-                Admin: {user.name} | Farm: {user.farm}
-              </p>
+            
             </div>
             <button
               onClick={onLogout}
@@ -76,11 +71,7 @@ const Dashboard = ({ user, onLogout }) => {
       )}
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-
-        {/* Attack Simulator */}
-        <AttackSimulator />
-
-        {/* Sensor Cards */}      
+        {/* Sensor Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <SensorCard
             title="Soil Moisture"
@@ -105,7 +96,6 @@ const Dashboard = ({ user, onLogout }) => {
             icon="🚰"
             color={readings.valve === 1 ? 'green' : 'gray'}
             status={readings.valve === 1 ? 'Active' : 'Inactive'}
-            subtitle={readings.valve === 1 ? `Flow: ${readings.valve_flow_rate.toFixed(2)} L/min` : ''}
           />
         </div>
 
@@ -138,18 +128,8 @@ const Dashboard = ({ user, onLogout }) => {
           />
         </div>
 
-        <div className="mb-8">
-          <SensorChart
-            title="Valve Flow Rate (L/min)"
-            data={history.valve_flow_rate}
-            labels={history.timestamps}
-            color="rgb(59, 130, 246)"
-            unit=" L/min"
-            type="linear"
-          />
-        </div>
-
-      
+        {/* Attack Simulator */}
+        <AttackSimulator />
       </div>
     </div>
   );
