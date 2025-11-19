@@ -45,6 +45,13 @@ const AttackSimulator = () => {
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg p-6">
+            {attackActive && (
+        <div className="mt-4 bg-red-900 border border-red-700 rounded p-4">
+          <p className="text-red-200 font-semibold">
+            ⚠️ Active Attack: Manipulation on {target} readings
+          </p>
+        </div>
+      )}
       <div className="flex items-center mb-4">
         <span className="text-2xl mr-3">⚠️</span>
         <h3 className="text-xl font-semibold text-white">Threat Simulation Panel</h3>
@@ -107,13 +114,7 @@ const AttackSimulator = () => {
         )}
       </div>
 
-      {attackActive && (
-        <div className="mt-4 bg-red-900 border border-red-700 rounded p-4">
-          <p className="text-red-200 font-semibold">
-            ⚠️ Active Attack: Manipulating {target} readings by {intensity > 0 ? '+' : ''}{intensity}
-          </p>
-        </div>
-      )}
+
     </div>
   );
 };
