@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState } from 'react';
 
 const Login = ({ onLogin }) => {
@@ -12,7 +13,7 @@ const Login = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
