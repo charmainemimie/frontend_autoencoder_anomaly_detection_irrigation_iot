@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState, useEffect } from 'react';
 import SensorCard from './SensorCard';
 import SensorChart from './SensorChart';
@@ -21,7 +22,7 @@ const Dashboard = ({ user, onLogout }) => {
   useEffect(() => {
     const fetchReadings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/readings');
+        const response = await fetch(`${API_URL}/api/readings`);
         const data = await response.json();
         
         setReadings(data);

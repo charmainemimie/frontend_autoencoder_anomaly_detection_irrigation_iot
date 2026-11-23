@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import React, { useState } from 'react';
 
 const AttackSimulator = () => {
@@ -7,7 +8,7 @@ const AttackSimulator = () => {
 
   const startAttack = async () => {
     try {
-      await fetch('http://localhost:5000/api/simulate-attack', {
+      await fetch(`${API_URL}/api/simulate-attack`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,7 +27,7 @@ const AttackSimulator = () => {
 
   const stopAttack = async () => {
     try {
-      await fetch('http://localhost:5000/api/simulate-attack', {
+      await fetch(`${API_URL}/api/simulate-attack`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

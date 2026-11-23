@@ -1,16 +1,58 @@
-# React + Vite
+# AgriCyber Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React dashboard for the smart irrigation anomaly detection system. It shows live soil moisture and temperature readings, irrigation valve status and autoencoder anomaly alerts, and includes an attack simulator for testing detection.
 
-Currently, two official plugins are available:
+Backend: [backend_autoencoder_anomaly_detection_irrigation_iot](https://github.com/charmainemimie/backend_autoencoder_anomaly_detection_irrigation_iot), deployed at https://agricyber.onrender.com
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech stack
 
-## React Compiler
+React 19, Vite, Tailwind CSS, Recharts, lucide-react, React Router.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting started
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+`npm run dev` reads `.env.development` and talks to a backend running locally on `http://localhost:5000` (start it with `python app.py` in the backend repo).
+
+## Backend URL
+
+All API calls use `API_URL` from `src/config.js`:
+
+| Situation                     | Backend used                                       |
+| ----------------------------- | -------------------------------------------------- |
+| `npm run dev`                 | `http://localhost:5000` (from `.env.development`)  |
+| `npm run build` with no env   | `https://agricyber.onrender.com`                   |
+| `VITE_API_URL` set at build   | Whatever you set it to                             |
+
+To point a build at another backend:
+
+```bash
+VITE_API_URL=https://your-backend.example.com npm run build
+```
+
+On Vercel or Netlify, add `VITE_API_URL` as an environment variable instead.
+
+## Endpoints used
+
+| Endpoint               | Method | Used by           |
+| ---------------------- | ------ | ----------------- |
+| `/api/login`           | POST   | Login             |
+| `/api/readings`        | GET    | Dashboard (polls) |
+| `/api/simulate-attack` | POST   | Attack simulator  |
+
+## Notes
+
+- The backend is on Render's free plan, which sleeps after about 15 minutes without traffic. The first request after that can take up to a minute while it wakes up.
+- Demo login: `agricyber` / `agricyber123`, unless `DEMO_PASSWORD` is set on the backend.
+
+## Scripts
+
+| Command           | What it does                         |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | Start the dev server with hot reload |
+| `npm run build`   | Production build into `dist/`        |
+| `npm run preview` | Serve the production build locally   |
+| `npm run lint`    | Run ESLint                           |
